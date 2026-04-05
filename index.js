@@ -19,7 +19,7 @@ CLIENT.once("clientReady", async (client) => {
       client.destroy();
       console.log("Connection closed.");
     },
-    process.env.FOLLOW_UP_PING_HOURS * 60 * 60 * 1000,
+    parseInt(process.env.FOLLOW_UP_PING_HOURS) * 60 * 60 * 1000,
   );
 });
 
