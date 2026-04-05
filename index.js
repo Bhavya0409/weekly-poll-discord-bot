@@ -13,7 +13,7 @@ client.once("ready", async () => {
 
   await client.rest.post(`/channels/${process.env.CHANNEL_ID}/messages`, {
     body: {
-      content: "@everyone What is your availability this week?", // this pings the role
+      content: `<@&${process.env.ROLE_ID}> What is your availability this week?`,
       poll: {
         question: { text: `Availability - Week of ${VAR_1}` },
         answers: [
