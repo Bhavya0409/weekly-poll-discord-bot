@@ -5,7 +5,10 @@ import { getFollowingDay } from "./utils.js";
  *
  * @param client The discord client object
  *
- * @returns The id of the message created
+ * @returns {
+ *   messageId: The id of the message created,
+ *   date: "Month/Date" string format
+ * }
  */
 export const sendPoll = async (client) => {
   const date = getFollowingDay();
@@ -26,13 +29,13 @@ export const sendPoll = async (client) => {
             { poll_media: { text: "Saturday" } },
           ],
           allow_multiselect: true,
-          duration: 24,
+          duration: parseInt(process.env.POLL_LENGTH_HOURS),
         },
       },
     },
   );
   console.log(`Poll sent for week of ${date}`);
-  return response.id;
+  return { messageId: response.id, date };
 };
 
 /**
@@ -53,8 +56,9 @@ export const getPlayerIds = async (client) => {
 /**
  * @param client    The discord client object
  * @param messageId The id of the poll message
+ * @param playerIds The ids of the players assigned to the role
  */
-export const pingNonVoters = async (client, messageId) => {
+export const pingNonVoters = async (client, messageId, playerIds) => {
   const voters = new Set();
 
   for (let answerId = 1; answerId <= 7; answerId++) {
@@ -63,8 +67,6 @@ export const pingNonVoters = async (client, messageId) => {
     );
     response.users.forEach((user) => voters.add(user.id));
   }
-
-  const playerIds = await getPlayerIds(client);
 
   const nonVoters = playerIds.filter((id) => !voters.has(id));
 
@@ -76,4 +78,55 @@ export const pingNonVoters = async (client, messageId) => {
       },
     });
   }
+};
+
+/**
+ *
+ * @param client    The discord client object
+ * @param messageId The id of the poll message
+ * @param playerIds The ids of the players assigned to the role
+ * @param date      The formatted date string
+ */
+export const sendSummary = async (client, messageId, playerIds, date) => {
+  const days = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+  const ROSTER_SIZE = 5;
+  const answerVotes = {};
+
+  for (let answerId = 1; answerId <= 7; answerId++) {
+    const response = await client.rest.get(
+      `/channels/${process.env.CHANNEL_ID}/polls/${messageId}/answers/${answerId}`,
+    );
+    answerVotes[answerId] = response.users;
+  }
+
+  let summary = `📊 **Availability Summary — Week of ${date}**\n\n`;
+
+  for (let i = 0; i < days.length; i++) {
+    const votes = answerVotes[i + 1];
+    const count = votes.length;
+    const voterIds = votes.map((u) => u.id);
+    const day = days[i];
+
+    if (count === ROSTER_SIZE) {
+      summary += `✅ ${day}\n`;
+    } else if (count === ROSTER_SIZE - 1) {
+      const missingIds = playerIds.filter((id) => !voterIds.includes(id));
+      const missingPings = missingIds.map((id) => `<@${id}>`).join(", ");
+      summary += `⚠️ ${day} — missing: ${missingPings}\n`;
+    } else {
+      summary += `❌ ${day}\n`;
+    }
+  }
+
+  await client.rest.post(`/channels/${process.env.CHANNEL_ID}/messages`, {
+    body: { content: summary },
+  });
 };
