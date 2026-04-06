@@ -33,8 +33,7 @@ CLIENT.once("clientReady", async (client) => {
     async () => {
       await pingNonVoters(client, messageId, playerIds);
     },
-    5000,
-    // parseInt(process.env.FOLLOW_UP_PING_HOURS) * 60 * 60 * 1000,
+    parseInt(process.env.FOLLOW_UP_PING_HOURS) * 60 * 60 * 1000,
   );
   setTimeout(
     async () => {
@@ -48,8 +47,7 @@ CLIENT.once("clientReady", async (client) => {
       await pinMessage(client, summaryResponseId);
       client.destroy();
     },
-    10000,
-    // parseInt(process.env.POLL_LENGTH_HOURS) * 60 * 60 * 1000,
+    parseInt(process.env.POLL_LENGTH_HOURS) * 60 * 60 * 1000,
   );
 });
 
