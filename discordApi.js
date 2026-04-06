@@ -1,6 +1,28 @@
 import { getFollowingDay } from "./utils.js";
 
 /**
+ * If a previous poll is pinned, remove it
+ *
+ * @param client The discord client object
+ */
+export const unpinPreviousPoll = async (client) => {
+  // Fetch all pinned messages
+  const pins = await client.rest.get(
+    `/channels/${process.env.CHANNEL_ID}/pins`,
+  );
+
+  // Find the last pinned poll
+  const lastPinnedPoll = pins.find((pin) => pin.poll);
+
+  // Unpin it if found
+  if (lastPinnedPoll) {
+    await client.rest.delete(
+      `/channels/${process.env.CHANNEL_ID}/pins/${lastPinnedPoll.id}`,
+    );
+  }
+};
+
+/**
  * Send a poll to the channel, and ping the relevant role from the env variable
  *
  * @param client The discord client object
@@ -36,6 +58,18 @@ export const sendPoll = async (client) => {
   );
   console.log(`Poll sent for week of ${date}`);
   return { messageId: response.id, date };
+};
+
+/**
+ * Pin the poll
+ *
+ * @param {*} client    The discord client object
+ * @param {*} messageId The id of the poll message
+ */
+export const pinPoll = async (client, messageId) => {
+  await client.rest.put(
+    `/channels/${process.env.CHANNEL_ID}/pins/${messageId}`,
+  );
 };
 
 /**

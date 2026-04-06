@@ -6,6 +6,8 @@ import {
   pingNonVoters,
   getPlayerIds,
   sendSummary,
+  unpinPreviousPoll,
+  pinPoll,
 } from "./discordApi.js";
 
 const CLIENT = new Client({
@@ -16,7 +18,10 @@ CLIENT.once("clientReady", async (client) => {
   // Once the client connection has been established, send the poll
   console.log("Established connection. Sending poll...");
   const playerIds = await getPlayerIds(client);
+
+  await unpinPreviousPoll(client);
   const { messageId, date } = await sendPoll(client);
+  await pinPoll(client, messageId);
 
   // After the poll has been created wait "FOLLOW_UP_PING_HOURS" hours and send a follow up ping to the people that haven't submitted their answers yet.
   setTimeout(
