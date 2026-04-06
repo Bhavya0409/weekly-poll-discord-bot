@@ -81,6 +81,7 @@ export const pingNonVoters = async (client, messageId, playerIds) => {
 };
 
 /**
+ * Send a summary of poll, highlighting the days that work the best for people
  *
  * @param client    The discord client object
  * @param messageId The id of the poll message
