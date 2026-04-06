@@ -23,6 +23,28 @@ export const unpinPreviousPoll = async (client) => {
 };
 
 /**
+ * If a previous summary is pinned, remove it
+ *
+ * @param client The discord client object
+ */
+export const unpinPreviousSummary = async (client) => {
+  // Fetch all pinned messages
+  const pins = await client.rest.get(
+    `/channels/${process.env.CHANNEL_ID}/pins`,
+  );
+
+  const lastPinnedSummary = pins.find(
+    (pin) => !pin.poll && pin.content?.startsWith("📊"),
+  );
+
+  if (lastPinnedSummary) {
+    await client.rest.delete(
+      `/channels/${process.env.CHANNEL_ID}/pins/${lastPinnedSummary.id}`,
+    );
+  }
+};
+
+/**
  * Send a poll to the channel, and ping the relevant role from the env variable
  *
  * @param client The discord client object
@@ -61,12 +83,12 @@ export const sendPoll = async (client) => {
 };
 
 /**
- * Pin the poll
+ * Pin a message
  *
  * @param {*} client    The discord client object
- * @param {*} messageId The id of the poll message
+ * @param {*} messageId The id of the message
  */
-export const pinPoll = async (client, messageId) => {
+export const pinMessage = async (client, messageId) => {
   await client.rest.put(
     `/channels/${process.env.CHANNEL_ID}/pins/${messageId}`,
   );
@@ -161,7 +183,12 @@ export const sendSummary = async (client, messageId, playerIds, date) => {
     }
   }
 
-  await client.rest.post(`/channels/${process.env.CHANNEL_ID}/messages`, {
-    body: { content: summary },
-  });
+  const summaryResponse = await client.rest.post(
+    `/channels/${process.env.CHANNEL_ID}/messages`,
+    {
+      body: { content: summary },
+    },
+  );
+
+  return summaryResponse.id;
 };
