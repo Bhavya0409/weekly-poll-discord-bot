@@ -1,5 +1,16 @@
 import { getFollowingDay } from "./utils.js";
 
+const DAYS = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+const ROSTER_SIZE = 5;
+
 /**
  * If a previous poll is pinned, remove it
  *
@@ -136,6 +147,19 @@ export const pingNonVoters = async (client, messageId, playerIds) => {
   }
 };
 
+export const getAnswers = async (client, messageId) => {
+  const answerVotes = {};
+
+  for (let answerId = 1; answerId <= DAYS.length; answerId++) {
+    const response = await client.rest.get(
+      `/channels/${process.env.CHANNEL_ID}/polls/${messageId}/answers/${answerId}`,
+    );
+    answerVotes[answerId] = response.users;
+  }
+
+  return answerVotes;
+};
+
 /**
  * Send a summary of poll, highlighting the days that work the best for people
  *
@@ -144,33 +168,14 @@ export const pingNonVoters = async (client, messageId, playerIds) => {
  * @param playerIds The ids of the players assigned to the role
  * @param date      The formatted date string
  */
-export const sendSummary = async (client, messageId, playerIds, date) => {
-  const days = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
-  const ROSTER_SIZE = 5;
-  const answerVotes = {};
-
-  for (let answerId = 1; answerId <= 7; answerId++) {
-    const response = await client.rest.get(
-      `/channels/${process.env.CHANNEL_ID}/polls/${messageId}/answers/${answerId}`,
-    );
-    answerVotes[answerId] = response.users;
-  }
-
+export const sendSummary = async (client, answerVotes, playerIds, date) => {
   let summary = `📊 **Availability Summary — Week of ${date}**\n\n`;
 
-  for (let i = 0; i < days.length; i++) {
+  for (let i = 0; i < DAYS.length; i++) {
     const votes = answerVotes[i + 1];
     const count = votes.length;
     const voterIds = votes.map((u) => u.id);
-    const day = days[i];
+    const day = DAYS[i];
 
     if (count === ROSTER_SIZE) {
       summary += `✅ ${day}\n`;
@@ -191,4 +196,34 @@ export const sendSummary = async (client, messageId, playerIds, date) => {
   );
 
   return summaryResponse.id;
+};
+
+export const createThread = async (client, dayOfWeek, date) => {
+  const title = `${dayOfWeek} ${date} - Scrim vs ___`;
+
+  // 1. Create message - A new thread needs a message to be created from
+  const message = await client.rest.post(
+    `/channels/${process.env.SCRIM_CHANNEL_ID}/messages`,
+    {
+      body: { content: `<@&${process.env.ROLE_ID}>` },
+    },
+  );
+
+  // 2. Convert to thread
+  await client.rest.post(
+    `/channels/${process.env.SCRIM_CHANNEL_ID}/messages/${message.id}/threads`,
+    {
+      body: {
+        name: title,
+        auto_archive_duration: 10080, // 7 days * 24 hours * 60 minutes
+      },
+    },
+  );
+
+  // 3. Delete message
+  // await client.rest.delete(
+  //   `/channels/${process.env.SCRIM_CHANNEL_ID}/messages/${message.id}`,
+  // );
+
+  console.log(`Successfully created thread: ${title}`);
 };

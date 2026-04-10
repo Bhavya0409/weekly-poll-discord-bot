@@ -9,6 +9,7 @@ import {
   unpinPreviousPoll,
   unpinPreviousSummary,
   pinMessage,
+  getAnswers,
 } from "./discordApi.js";
 
 const CLIENT = new Client({
@@ -38,13 +39,15 @@ CLIENT.once("clientReady", async (client) => {
   setTimeout(
     async () => {
       await unpinPreviousPoll(client);
+      const answers = await getAnswers(client, messageId);
       const summaryResponseId = await sendSummary(
         client,
-        messageId,
+        answers,
         playerIds,
         date,
       );
       await pinMessage(client, summaryResponseId);
+      // await createThreads();
       client.destroy();
     },
     parseInt(process.env.POLL_LENGTH_HOURS) * 60 * 60 * 1000,
