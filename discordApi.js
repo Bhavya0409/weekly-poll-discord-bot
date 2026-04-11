@@ -150,11 +150,12 @@ export const pingNonVoters = async (client, messageId, playerIds) => {
 export const getAnswers = async (client, messageId) => {
   const answerVotes = {};
 
-  for (let answerId = 1; answerId <= DAYS.length; answerId++) {
+  for (let answerId = 0; answerId < DAYS.length; answerId++) {
     const response = await client.rest.get(
-      `/channels/${process.env.CHANNEL_ID}/polls/${messageId}/answers/${answerId}`,
+      `/channels/${process.env.CHANNEL_ID}/polls/${messageId}/answers/${answerId + 1}`,
     );
-    answerVotes[answerId] = response.users;
+    const day = DAYS[answerId]
+    answerVotes[day] = response.users;
   }
 
   return answerVotes;
@@ -163,19 +164,19 @@ export const getAnswers = async (client, messageId) => {
 /**
  * Send a summary of poll, highlighting the days that work the best for people
  *
- * @param client    The discord client object
- * @param messageId The id of the poll message
- * @param playerIds The ids of the players assigned to the role
- * @param date      The formatted date string
+ * @param client      The discord client object
+ * @param answerVotes The list of answers
+ * @param playerIds   The ids of the players assigned to the role
+ * @param date        The formatted date string
  */
 export const sendSummary = async (client, answerVotes, playerIds, date) => {
   let summary = `📊 **Availability Summary — Week of ${date}**\n\n`;
 
   for (let i = 0; i < DAYS.length; i++) {
-    const votes = answerVotes[i + 1];
+    const day = DAYS[i];
+    const votes = answerVotes[day];
     const count = votes.length;
     const voterIds = votes.map((u) => u.id);
-    const day = DAYS[i];
 
     if (count === ROSTER_SIZE) {
       summary += `✅ ${day}\n`;
