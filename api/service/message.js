@@ -3,6 +3,12 @@ import {DAYS, ROSTER_SIZE} from "../../utils/constants.js";
 import {sendMessage} from "../base/message.js";
 import {getPlayerIds, getResponses, getVoters} from "./helpers.js";
 
+/**
+ * Send the weekly availability poll
+ *
+ * @param client Discord client object
+ * @returns {Promise<{messageId: *, date: string}>}
+ */
 export const sendPoll = async (client) => {
 	const date = getNextSunday();
 	const response = await client.rest.post(
@@ -30,6 +36,13 @@ export const sendPoll = async (client) => {
 	console.log(`Poll sent for week of ${date}`);
 	return {messageId: response.id, date};
 }
+/**
+ * Send a reminder to the users that have the role but didn't vote yet
+ *
+ * @param client        Discord client object
+ * @param pollMessageId Message ID of the poll
+ * @returns {Promise<void>}
+ */
 export const sendReminder = async (client, pollMessageId) => {
 	const voters = await getVoters(client, pollMessageId)
 	
@@ -40,6 +53,14 @@ export const sendReminder = async (client, pollMessageId) => {
 		await sendMessage(client, `${pings} Reminder to please fill out the availability poll! 🗓️`)
 	}
 }
+/**
+ * Send a summary of the users and answers of the polls
+ *
+ * @param client        Discord client object
+ * @param pollMessageId Message ID of the poll
+ * @param date          Date of the poll (ex. 04/11)
+ * @returns {Promise<*>}
+ */
 export const sendSummary = async (client, pollMessageId, date) => {
 	const responses = await getResponses(client, pollMessageId)
 	const playerIds = await getPlayerIds(client)
