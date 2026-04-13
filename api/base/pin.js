@@ -1,3 +1,5 @@
+import {CONFIG} from "../../config.js";
+
 /**
  * Get all pins in the channel
  *
@@ -6,7 +8,7 @@
  */
 export const getPins = async (client) => {
 	return await client.rest.get(
-		`/channels/${process.env.CHANNEL_ID}/pins`,
+		`/channels/${CONFIG.CHANNEL_ID}/pins`,
 	);
 }
 /**
@@ -18,7 +20,7 @@ export const getPins = async (client) => {
  */
 export const deletePin = async (client, messageId) => {
 	await client.rest.delete(
-		`/channels/${process.env.CHANNEL_ID}/pins/${messageId}`,
+		`/channels/${CONFIG.CHANNEL_ID}/pins/${messageId}`,
 	);
 }
 /**
@@ -30,6 +32,6 @@ export const deletePin = async (client, messageId) => {
  */
 export const createPin = async (client, messageId) => {
 	await client.rest.put(
-		`/channels/${process.env.CHANNEL_ID}/pins/${messageId}`,
+		`/channels/${CONFIG.CHANNEL_ID}/pins/${messageId}`,
 	);
 }

@@ -1,3 +1,5 @@
+import {CONFIG} from "../../config.js";
+
 /**
  * Send a message to the channel
  *
@@ -6,7 +8,7 @@
  * @returns {Promise<unknown>}
  */
 export const sendMessage = async (client, message) => {
-	return await client.rest.post(`/channels/${process.env.CHANNEL_ID}/messages`, {
+	return await client.rest.post(`/channels/${CONFIG.CHANNEL_ID}/messages`, {
 		body: {
 			content: message,
 		},

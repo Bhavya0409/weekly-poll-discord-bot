@@ -1,4 +1,5 @@
 import {DAYS} from "../../utils/constants.js";
+import {CONFIG} from "../../config.js";
 
 /**
  * Get all the player ids that have the role
@@ -7,9 +8,9 @@ import {DAYS} from "../../utils/constants.js";
  * @returns {Promise<[]>}
  */
 export const getPlayerIds = async (client) => {
-	const guild = await client.guilds.fetch(process.env.GUILD_ID);
+	const guild = await client.guilds.fetch(CONFIG.GUILD_ID);
 	await guild.members.fetch(); // force fetches all members into cache
-	const role = await guild.roles.fetch(process.env.ROLE_ID);
+	const role = await guild.roles.fetch(CONFIG.ROLE_ID);
 	return role.members.map((member) => member.id);
 }
 /**
@@ -23,7 +24,7 @@ export const getResponses = async (client, pollMessageId) => {
 	const responses = []
 	for (let answerId = 1; answerId <= DAYS.length; answerId++) {
 		const response = await client.rest.get(
-			`/channels/${process.env.CHANNEL_ID}/polls/${pollMessageId}/answers/${answerId}`,
+			`/channels/${CONFIG.CHANNEL_ID}/polls/${pollMessageId}/answers/${answerId}`,
 		);
 		responses.push(response)
 	}
