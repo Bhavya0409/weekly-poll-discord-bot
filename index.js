@@ -2,7 +2,15 @@ import "dotenv/config";
 import {Client, Events, GatewayIntentBits} from "discord.js";
 
 import {CONFIG} from "./config.js";
-import {sendPoll, sendReminder, sendSummary, unpinPreviousPoll, unpinPreviousSummary} from "./api/service/index.js";
+import {
+	getResponses,
+	sendPoll,
+	sendReminder,
+	sendSummary,
+	unpinPreviousPoll,
+	unpinPreviousSummary,
+	createScrimThreads
+} from "./api/service/index.js";
 import {createPin} from "./api/base/index.js";
 
 const CLIENT = new Client({
@@ -28,12 +36,14 @@ CLIENT.once(Events.ClientReady, async (client) => {
 	setTimeout(
 		async () => {
 			await unpinPreviousPoll(client);
+			const responses = await getResponses(client, messageId)
 			const summaryResponseId = await sendSummary(
 				client,
-				messageId,
 				date,
+				responses
 			);
 			await createPin(client, summaryResponseId);
+			await createScrimThreads(client, responses, date)
 			await client.destroy();
 		},
 		CONFIG.POLL_LENGTH_HOURS * 60 * 60 * 1000,

@@ -15,11 +15,11 @@ export const formatDate = (date) => {
 /**
  * Return the JS Date object of the next Sunday
  *
- * @returns {`${string}/${string}`}
+ * @returns {Date}
  */
 export const getNextSunday = () => {
 	const now = new Date();
 	const daysUntilSunday = (DAYS.length - now.getDay()) % DAYS.length || DAYS.length;
 	now.setDate(now.getDate() + daysUntilSunday);
-	return formatDate(now);
+	return now;
 }
