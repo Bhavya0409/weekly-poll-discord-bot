@@ -12,7 +12,7 @@ import {DAYS, ROSTER_SIZE} from "../../utils/constants.js";
  */
 const createScrimThread = async (client, date) => {
 	const displayDate = formatDate(date)
-	const title = `${DAYS[date.getDay()]} ${displayDate} - Scrim vs ___`;
+	const title = `(X-X) ${DAYS[date.getDay()]} ${displayDate} - Scrim vs ___`;
 	const message = await sendMessage(client, `<@&${CONFIG.ROLE_ID}>`, CONFIG.SCRIM_CHANNEL_ID)
 	await createThread(client, message.id, title)
 }
