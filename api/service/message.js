@@ -1,24 +1,25 @@
-import {getNextSunday} from "../../utils/dateFns.js";
+import {formatDate, getNextSunday} from "../../utils/dateFns.js";
 import {DAYS, ROSTER_SIZE} from "../../utils/constants.js";
 import {CONFIG} from "../../config.js";
 import {sendMessage} from "../base/message.js";
-import {getPlayerIds, getResponses, getVoters} from "./helpers.js";
+import {getPlayerIds, getVoters} from "./helpers.js";
 
 /**
  * Send the weekly availability poll
  *
  * @param client Discord client object
- * @returns {Promise<{messageId: *, date: string}>}
+ * @returns {Promise<{messageId: *, date: Date}>}
  */
 export const sendPoll = async (client) => {
 	const date = getNextSunday();
+	const displayDate = formatDate(date)
 	const response = await client.rest.post(
 		`/channels/${CONFIG.CHANNEL_ID}/messages`,
 		{
 			body: {
 				content: `<@&${CONFIG.ROLE_ID}> What is your availability this week?`,
 				poll: {
-					question: {text: `Availability - Week of ${date}`},
+					question: {text: `Availability - Week of ${displayDate}`},
 					answers: [
 						{poll_media: {text: "Sunday"}},
 						{poll_media: {text: "Monday"}},
@@ -34,7 +35,7 @@ export const sendPoll = async (client) => {
 			},
 		},
 	);
-	console.log(`Poll sent for week of ${date}`);
+	console.log(`Poll sent for week of ${displayDate}`);
 	return {messageId: response.id, date};
 }
 /**
@@ -57,16 +58,15 @@ export const sendReminder = async (client, pollMessageId) => {
 /**
  * Send a summary of the users and answers of the polls
  *
- * @param client        Discord client object
- * @param pollMessageId Message ID of the poll
- * @param date          Date of the poll (ex. 04/11)
+ * @param client    Discord client object
+ * @param date      Date of the poll
+ * @param responses List of poll responses, each having a list of users that voted for the response
  * @returns {Promise<*>}
  */
-export const sendSummary = async (client, pollMessageId, date) => {
-	const responses = await getResponses(client, pollMessageId)
+export const sendSummary = async (client, date, responses) => {
 	const playerIds = await getPlayerIds(client)
 	
-	let summary = `📊 **Availability Summary — Week of ${date}**\n\n`;
+	let summary = `📊 **Availability Summary — Week of ${formatDate(date)}**\n\n`;
 	
 	for (let i = 1; i <= DAYS.length; i++) {
 		const votes = responses[i - 1].users
