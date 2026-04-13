@@ -1,5 +1,6 @@
 import {getNextSunday} from "../../utils/dateFns.js";
 import {DAYS, ROSTER_SIZE} from "../../utils/constants.js";
+import {CONFIG} from "../../config.js";
 import {sendMessage} from "../base/message.js";
 import {getPlayerIds, getResponses, getVoters} from "./helpers.js";
 
@@ -12,10 +13,10 @@ import {getPlayerIds, getResponses, getVoters} from "./helpers.js";
 export const sendPoll = async (client) => {
 	const date = getNextSunday();
 	const response = await client.rest.post(
-		`/channels/${process.env.CHANNEL_ID}/messages`,
+		`/channels/${CONFIG.CHANNEL_ID}/messages`,
 		{
 			body: {
-				content: `<@&${process.env.ROLE_ID}> What is your availability this week?`,
+				content: `<@&${CONFIG.ROLE_ID}> What is your availability this week?`,
 				poll: {
 					question: {text: `Availability - Week of ${date}`},
 					answers: [
@@ -28,7 +29,7 @@ export const sendPoll = async (client) => {
 						{poll_media: {text: "Saturday"}},
 					],
 					allow_multiselect: true,
-					duration: parseInt(process.env.POLL_LENGTH_HOURS),
+					duration: CONFIG.POLL_LENGTH_HOURS,
 				},
 			},
 		},

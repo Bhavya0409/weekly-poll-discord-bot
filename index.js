@@ -1,6 +1,7 @@
 import "dotenv/config";
 import {Client, Events, GatewayIntentBits} from "discord.js";
 
+import {CONFIG} from "./config.js";
 import {sendPoll, sendReminder, sendSummary, unpinPreviousPoll, unpinPreviousSummary} from "./api/service/index.js";
 import {createPin} from "./api/base/index.js";
 
@@ -22,7 +23,7 @@ CLIENT.once(Events.ClientReady, async (client) => {
 		async () => {
 			await sendReminder(client, messageId);
 		},
-		parseInt(process.env.FOLLOW_UP_PING_HOURS) * 60 * 60 * 1000,
+		CONFIG.FOLLOW_UP_PING_HOURS * 60 * 60 * 1000,
 	);
 	setTimeout(
 		async () => {
@@ -35,8 +36,8 @@ CLIENT.once(Events.ClientReady, async (client) => {
 			await createPin(client, summaryResponseId);
 			await client.destroy();
 		},
-		parseInt(process.env.POLL_LENGTH_HOURS) * 60 * 60 * 1000,
+		CONFIG.POLL_LENGTH_HOURS * 60 * 60 * 1000,
 	);
 });
 
-CLIENT.login(process.env.BOT_TOKEN).then(() => console.log('Logged in to discord'));
+CLIENT.login(CONFIG.BOT_TOKEN).then(() => console.log('Logged in to discord'));
