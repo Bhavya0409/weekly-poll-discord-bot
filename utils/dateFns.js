@@ -12,14 +12,36 @@ export const formatDate = (date) => {
 	
 	return `${month}/${day}`;
 }
+
 /**
- * Return the JS Date object of the next Sunday
+ * Given a JS Date object, return the day name (ex. Monday, Tuesday, etc.)
+ *
+ * @param date Date object
+ * @returns {string}
+ */
+export const getDayName = (date) => {
+	return DAYS[date.getDay()];
+}
+
+/**
+ * Return the JS Date object of the next day (tomorrow)
  *
  * @returns {Date}
  */
-export const getNextSunday = () => {
-	const now = new Date();
-	const daysUntilSunday = (DAYS.length - now.getDay()) % DAYS.length || DAYS.length;
-	now.setDate(now.getDate() + daysUntilSunday);
-	return now;
+export const getNextDay = () => {
+	const next = new Date();
+	next.setDate(next.getDate() + 1);
+	return next;
+}
+
+/**
+ * Given a start date, return the end date 7 days later
+ *
+ * @param startDate Date object
+ * @returns {Date}
+ */
+export const getEndDate = (startDate) => {
+	const end = new Date(startDate);
+	end.setDate(end.getDate() + 6);
+	return end;
 }

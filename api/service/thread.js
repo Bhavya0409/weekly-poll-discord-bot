@@ -1,7 +1,7 @@
 import {CONFIG} from "../../config.js";
 import {createThread, sendMessage} from "../base/index.js";
-import {formatDate} from "../../utils/dateFns.js";
-import {DAYS, ROSTER_SIZE} from "../../utils/constants.js";
+import {formatDate, getDayName} from "../../utils/dateFns.js";
+import {ROSTER_SIZE} from "../../utils/constants.js";
 
 /**
  * Create a new thread for a scrim
@@ -12,7 +12,8 @@ import {DAYS, ROSTER_SIZE} from "../../utils/constants.js";
  */
 const createScrimThread = async (client, date) => {
 	const displayDate = formatDate(date)
-	const title = `(X-X) ${DAYS[date.getDay()]} ${displayDate} - Scrim vs ___`;
+	const dayName = getDayName(date);
+	const title = `(X-X) ${dayName} ${displayDate} - Scrim vs ___`;
 	const message = await sendMessage(client, `<@&${CONFIG.ROLE_ID}>`, CONFIG.SCRIM_CHANNEL_ID)
 	await createThread(client, message.id, title)
 }
