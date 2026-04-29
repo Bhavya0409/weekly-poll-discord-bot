@@ -1,0 +1,21 @@
+I want to develop a new feature.
+
+Current State / Problem:
+
+The application operates under the following assumptions:
+1. There is a cron that exists outside the application that fires this application every SATURDAY.
+2. The application creates a poll that starts on the next upcoming Sunday and lists out 7 options, one per day, until the next Saturday.
+
+Ideal State / Goal:
+1. The cron can be run on any day of the week.
+2. The poll start date will be the day after the current date, and the end date will be the same day next week.
+For example, if the poll is started on Wednesday, then the poll will range from Thursday to next Wednesday.
+This all means that static logic around finding a specific day, or static poll options will have to be updated.
+
+Implementation Plan:
+1. The "getNextSunday" function should be replaced with "getNextDay". The idea of the function is to simply return the following day.
+2. The poll should not have the days be hard set to "Sunday" to "Saturday" but instead utilize the "getNextDay" function to dynamically generate the poll options
+3. Any reference to "Week of [DATE]" should be updated to say "Week of [Start Date] to [End Date]"
+4. Any reference to any variables that specify a day, should be renamed to be reference a more dynamic approach.
+
+Create an exact implementation plan. After the plan has been executed, create a digest of the updated changes.

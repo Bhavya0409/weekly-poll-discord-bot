@@ -27,12 +27,12 @@ CLIENT.once(Events.ClientReady, async (client) => {
 	await createPin(client, messageId);
 	
 	// After the poll has been created, wait "FOLLOW_UP_PING_HOURS" hours and send a follow up ping to the people that haven't submitted their answers yet.
-	setTimeout(
-		async () => {
-			await sendReminder(client, messageId);
-		},
-		CONFIG.FOLLOW_UP_PING_HOURS * 60 * 60 * 1000,
-	);
+	// setTimeout(
+	// 	async () => {
+	// 		await sendReminder(client, messageId);
+	// 	},
+	// 	CONFIG.FOLLOW_UP_PING_HOURS * 60 * 60 * 1000,
+	// );
 	setTimeout(
 		async () => {
 			await unpinPreviousPoll(client);
@@ -46,6 +46,7 @@ CLIENT.once(Events.ClientReady, async (client) => {
 			await createScrimThreads(client, responses, date)
 			await client.destroy();
 		},
+		5000,
 		CONFIG.POLL_LENGTH_HOURS * 60 * 60 * 1000,
 	);
 });
